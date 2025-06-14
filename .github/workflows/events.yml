@@ -2,29 +2,41 @@ name: Check for Events and Send Email
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'  # ⏰ elke dag, elk uur op :00 UTC
+  workflow_dispatch:      # 🔘 handmatig starten mogelijk via GitHub
 
 jobs:
   check-events:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: 📥 Repo ophalen
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: 🐍 Python installeren
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: '3.11'
 
-      - name: Install dependencies
+      - name: 📦 Afhankelijkheden installeren
         run: pip install requests
 
-      - name: Run event checker
+      - name: 📥 Download vorig seen_events artifact (indien aanwezig)
+        uses: actions/download-artifact@v4
+        with:
+          name: seen-events
+          path: .
+
+      - name: ▶️ Run events_emailer.py
         run: python events_emailer.py
         env:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+
+      - name: 📤 Upload nieuwe seen_events.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: seen-events
+          path: seen_events.json

@@ -27,8 +27,8 @@ jobs:
           name: seen-events
           path: .
 
-      - name: ▶️ Run events_emailer.py
-        run: python events_emailer.py
+      - name: ▶️ Run events_checker.py
+        run: python events_checker.py
         env:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}

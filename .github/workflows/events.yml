@@ -22,7 +22,7 @@ jobs:
         run: pip install requests
 
       - name: Run event checker
-        run: python events_emailer.py
+        run: python events_checker.py
         env:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}

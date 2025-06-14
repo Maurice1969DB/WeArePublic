@@ -2,8 +2,8 @@ name: Check for Events and Send Email
 
 on:
   schedule:
-    - cron: '0 * * * *' # Elke dag om 08:00 UTC
-  workflow_dispatch:    # Handmatig kunnen starten
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   check-events:

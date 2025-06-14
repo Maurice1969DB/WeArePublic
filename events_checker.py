@@ -3,7 +3,6 @@ import smtplib
 from email.mime.text import MIMEText
 
 import requests
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -24,17 +23,34 @@ EMAIL_TO = os.getenv("EMAIL_TO")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
+JSONBIN_ID = os.getenv("JSONBIN_ID")
+JSONBIN_KEY = os.getenv("JSONBIN_API_KEY")
+
+def load_seen_ids():
+    url = f"https://api.jsonbin.io/v3/b/{JSONBIN_ID}/latest"
+    headers = {
+        "X-Master-Key": JSONBIN_KEY,
+        "X-Bin-Meta": "false"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return set(response.json() or [])
+    else:
+        return set()
+
 def format_date(iso_string):
     dt = datetime.strptime(iso_string, "%Y-%m-%dT%H:%M:%S.%fZ")
     return dt.strftime("📅 %a %d %B %Y om %H:%M")
 
-def load_seen_ids():
-    if SEEN_FILE.exists():
-        return set(json.loads(SEEN_FILE.read_text()))
-    return set()
 
 def save_seen_ids(ids):
-    SEEN_FILE.write_text(json.dumps(list(ids), indent=2))
+    url = f"https://api.jsonbin.io/v3/b/{JSONBIN_ID}"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_KEY
+    }
+    response = requests.put(url, headers=headers, json=list(ids))
+    response.raise_for_status()
 
 def fetch_events():
     headers = {

@@ -24,11 +24,6 @@ EMAIL_TO = os.getenv("EMAIL_TO")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-EMAIL_FROM = "mauricevanloon1969@gmail.com"
-EMAIL_TO = "mauricevanloon1969@gmail.com"
-EMAIL_USER = "mauricevanloon1969@gmail.com"
-EMAIL_PASS = "tyzw eaux uoqp vmxn"
-
 def format_date(iso_string):
     dt = datetime.strptime(iso_string, "%Y-%m-%dT%H:%M:%S.%fZ")
     return dt.strftime("📅 %a %d %B %Y om %H:%M")

@@ -3,12 +3,12 @@ import smtplib
 from email.mime.text import MIMEText
 
 import requests
+import json
 from datetime import datetime
 from pathlib import Path
 
 API_URL = "https://wapi.wearepublic.nl/v2.0/events/"
 API_KEY = "YDQ-Ep-Jy6gvLiKa4yUjC!ZUaCJCssu7sd@HQpBF!muTeU_P-HvigpL!-anTaV6y"
-
 
 QUERY = "Alles"
 DISCIPLINES = "Muziek"

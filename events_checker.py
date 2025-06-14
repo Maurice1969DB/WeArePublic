@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 API_URL = "https://wapi.wearepublic.nl/v2.0/events/"
-API_KEY = "YDQ-Ep-Jy6gvLiKa4yUjC!ZUaCJCssu7sd@HQpBF!muTeU_P-HvigpL!-anTaV6y"
+API_KEY = os.getenv("API_KEY")
 
 QUERY = "Alles"
 DISCIPLINES = "Muziek"

@@ -18,14 +18,15 @@ SEEN_FILE = Path("seen_events.json")
 # ✉️ Mailinstellingen
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
+JSONBIN_ID = "684d5c4c8a456b7966adff04"
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")
 EMAIL_TO = os.getenv("EMAIL_TO")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-JSONBIN_ID = os.getenv("JSONBIN_ID")
-JSONBIN_KEY = os.getenv("JSONBIN_KEY")
+# JSONBIN_ID = os.getenv("JSONBIN_ID")
+JSONBIN_KEY = os.getenv("JSONBIN_API_KEY")
 
 def load_seen_ids():
     url = f"https://api.jsonbin.io/v3/b/{JSONBIN_ID}/latest"
@@ -114,7 +115,7 @@ def main():
             title = ev["title"]
             link = f"https://wearepublic.nl/programma/{ev['uri']}"
             lines.append(f"🎭 {title} – {link}")
-        send_email(lines)
+       # send_email(lines)
         save_seen_ids(seen_ids.union(new_ids))
     else:
         print("Geen nieuwe interessante events gevonden.")

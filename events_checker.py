@@ -19,6 +19,7 @@ SEEN_FILE = Path("seen_events.json")
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 JSONBIN_ID = "684d5c4c8a456b7966adff04"
+JSONBIN_KEY = "$2a$10$st35O.PoBykUmiVS/BbNXOYAktXNS16zl.U5MSRmsjJOFixaAOB7C"
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")
 EMAIL_TO = os.getenv("EMAIL_TO")
@@ -26,7 +27,7 @@ EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 # JSONBIN_ID = os.getenv("JSONBIN_ID")
-JSONBIN_KEY = os.getenv("JSONBIN_API_KEY")
+# JSONBIN_KEY = os.getenv("JSONBIN_API_KEY")
 
 def load_seen_ids():
     url = f"https://api.jsonbin.io/v3/b/{JSONBIN_ID}/latest"

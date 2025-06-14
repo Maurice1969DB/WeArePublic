@@ -1,3 +1,4 @@
+import os
 import smtplib
 from email.mime.text import MIMEText
 
@@ -17,6 +18,12 @@ SEEN_FILE = Path("seen_events.json")
 # ✉️ Mailinstellingen
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
+
+EMAIL_FROM = os.getenv("EMAIL_FROM")
+EMAIL_TO = os.getenv("EMAIL_TO")
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
+
 EMAIL_FROM = "mauricevanloon1969@gmail.com"
 EMAIL_TO = "mauricevanloon1969@gmail.com"
 EMAIL_USER = "mauricevanloon1969@gmail.com"

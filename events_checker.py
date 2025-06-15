@@ -116,7 +116,7 @@ def main():
             title = ev["title"]
             link = f"https://wearepublic.nl/programma/{ev['uri']}"
             lines.append(f"🎭 {title} – {link}")
-       # send_email(lines)
+        send_email(lines)
         save_seen_ids(seen_ids.union(new_ids))
     else:
         print("Geen nieuwe interessante events gevonden.")

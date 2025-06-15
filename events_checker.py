@@ -3,7 +3,6 @@ import smtplib
 from email.mime.text import MIMEText
 
 import requests
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -71,7 +70,6 @@ def fetch_events():
     return response.json().get("events", [])
 
 def filter_events(events):
-    today = datetime.now()
     # def is_relevant(ev):
     #     try:
     #         start_date = datetime.strptime(ev["start_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -117,9 +115,26 @@ def main():
             title = ev["title"]
             uri = ev['uri']
             link = f"https://wearepublic.nl/programma/{uri}"
+            
+            date_str = ev.get("start_date", "")  # Aangenomen dat het veld 'startDate' heet
+            if date_str:
+                date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                formatted_date = date_obj.strftime("%-d %B %Y %H:%M")  # %-d verwijdert voorloopnul bij dag
+                nl_months = {
+                    'January': 'januari', 'February': 'februari', 'March': 'maart',
+                    'April': 'april', 'May': 'mei', 'June': 'juni',
+                    'July': 'juli', 'August': 'augustus', 'September': 'september',
+                    'October': 'oktober', 'November': 'november', 'December': 'december'
+                }
+                for en, nl in nl_months.items():
+                    formatted_date = formatted_date.replace(en, nl)
+                formatted_date += " uur"
+            else:
+                formatted_date = "Datum onbekend"
+
             disciplines = ", ".join(d["name"] for d in ev.get("disciplines", []))
             discipline_text = f" ({disciplines})" if disciplines else ""
-            lines.append(f'🎭 <a href="{link}">{title}</a>{discipline_text}')
+            lines.append(f'📅 {formatted_date} - 🎭 <a href="{link}">{title}</a>{discipline_text}')
         send_email(lines)
         save_seen_ids(seen_ids.union(new_ids))
     else:

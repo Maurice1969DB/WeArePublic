@@ -114,8 +114,11 @@ def main():
         lines = []
         for ev in new_events:
             title = ev["title"]
-            link = f"https://wearepublic.nl/programma/{ev['uri']}"
-            lines.append(f"🎭 {title} – {link}")
+            uri = ev['uri']
+            link = f"https://wearepublic.nl/programma/{uri}"
+            disciplines = ", ".join(d["name"] for d in ev.get("disciplines", []))
+            discipline_text = f" ({disciplines})" if disciplines else ""
+            lines.append(f'🎭 <a href="{link}">{title}</a>{discipline_text}')
         send_email(lines)
         save_seen_ids(seen_ids.union(new_ids))
     else:

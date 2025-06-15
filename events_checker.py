@@ -84,7 +84,7 @@ def filter_events(events):
     return list(events)
 
 def send_email(event_lines):
-    msg = MIMEText("\n".join(event_lines))
+    msg = MIMEText("\n".join(event_lines), 'html')
     msg["Subject"] = "🎭 Nieuwe interessante events!"
     msg["From"] = EMAIL_FROM
     msg["To"] = EMAIL_TO

@@ -21,7 +21,7 @@ EMAIL_TO = os.getenv("EMAIL_TO")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-SEEN_RETENTION_DAYS = 180
+SEEN_RETENTION_DAYS = 90
 HTTP_TIMEOUT = 30
 
 NL_MONTHS = {
@@ -124,7 +124,7 @@ def send_email(event_lines):
 
 
 def main():
-    seen = load_seen_ids()
+    original = load_seen_ids()
     events = fetch_events()
     today = datetime.now(timezone.utc).date().isoformat()
 
@@ -138,28 +138,32 @@ def main():
     # Bootstrap: geen seen-file betekent eerste run. Alle huidige events
     # registreren we als 'seen' zonder te mailen, anders krijg je 80 events
     # ineens. Vanaf de volgende run worden alleen écht nieuwe events gemaild.
-    if seen is None:
+    if original is None:
         save_seen_ids({eid(ev): today for ev in events})
         print(f"Bootstrap: {len(events)} events geseed als seen. Geen mail verzonden.")
         return
 
+    # Prune elke run, niet alleen wanneer er nieuwe events zijn — anders zou
+    # de file in rustige periodes blijven groeien tot er toevallig een nieuw
+    # event langskomt dat de save triggert.
+    seen = prune_seen(original)
     new_events = [ev for ev in events if eid(ev) not in seen]
+    for ev in new_events:
+        seen[eid(ev)] = today
+
+    # State eerst opslaan, dan pas mailen — als de save faalt willen we de
+    # mail niet versturen, anders krijgen we volgende run dubbele meldingen.
+    # Alleen schrijven als er écht iets veranderde, om geen lege bot-commits
+    # te triggeren.
+    if seen != original:
+        save_seen_ids(seen)
 
     if not new_events:
         print("Geen nieuwe events gevonden.")
         return
 
     print(f"Nieuwe events gevonden: {len(new_events)}\n")
-
     lines = [format_event_line(ev) for ev in new_events]
-
-    # State eerst opslaan, dan pas mailen — als de save faalt willen we de
-    # mail niet versturen, anders krijgen we volgende run dubbele meldingen.
-    for ev in new_events:
-        seen[eid(ev)] = today
-    seen = prune_seen(seen)
-    save_seen_ids(seen)
-
     send_email(lines)
 
 

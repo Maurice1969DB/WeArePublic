@@ -118,15 +118,22 @@ def main():
     events = fetch_events()
     today = datetime.now(timezone.utc).date().isoformat()
 
+    # IDs altijd als str: JSON-dicts mogen alleen string keys hebben, dus na
+    # serialisatie + load zijn ze sowieso str — door event-IDs ook bij de
+    # lookup naar str te casten voorkomen we dat int- en str-keys naast
+    # elkaar bestaan (sort_keys crasht daar dan op).
+    def eid(ev):
+        return str(ev["id"])
+
     # Bootstrap: geen seen-file betekent eerste run. Alle huidige events
     # registreren we als 'seen' zonder te mailen, anders krijg je 80 events
     # ineens. Vanaf de volgende run worden alleen écht nieuwe events gemaild.
     if seen is None:
-        save_seen_ids({ev["id"]: today for ev in events})
+        save_seen_ids({eid(ev): today for ev in events})
         print(f"Bootstrap: {len(events)} events geseed als seen. Geen mail verzonden.")
         return
 
-    new_events = [ev for ev in events if ev["id"] not in seen]
+    new_events = [ev for ev in events if eid(ev) not in seen]
 
     if not new_events:
         print("Geen nieuwe interessante events gevonden.")
@@ -139,7 +146,7 @@ def main():
     # State eerst opslaan, dan pas mailen — als de save faalt willen we de
     # mail niet versturen, anders krijgen we volgende run dubbele meldingen.
     for ev in new_events:
-        seen[ev["id"]] = today
+        seen[eid(ev)] = today
     seen = prune_seen(seen)
     save_seen_ids(seen)
 

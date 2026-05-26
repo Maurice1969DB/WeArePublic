@@ -93,15 +93,25 @@ def format_event_line(ev):
     else:
         formatted_date = "Datum onbekend"
 
+    venue = ev.get("venue") or {}
+    venue_name = venue.get("name")
+    city_name = (venue.get("city") or {}).get("name")
+    if venue_name and city_name and city_name.lower() not in venue_name.lower():
+        location = f"{venue_name}, {city_name}"
+    else:
+        location = venue_name or city_name
+    location_text = f" — {location}" if location else ""
+
     disciplines = ", ".join(d["name"] for d in ev.get("disciplines", []))
     discipline_text = f" ({disciplines})" if disciplines else ""
-    return f'📅 {formatted_date} - 🎭 <a href="{link}">{title}</a>{discipline_text}'
+
+    return f'{formatted_date} — <a href="{link}">{title}</a>{location_text}{discipline_text}'
 
 
 def send_email(event_lines):
     html_content = '<br>'.join(event_lines)
     msg = MIMEText(html_content, 'html')
-    msg["Subject"] = "🎭 Nieuwe interessante events!"
+    msg["Subject"] = "Nieuwe events op WeArePublic"
     msg["From"] = EMAIL_FROM
     msg["To"] = EMAIL_TO
 
@@ -110,7 +120,7 @@ def send_email(event_lines):
         server.login(EMAIL_USER, EMAIL_PASS)
         server.send_message(msg)
 
-    print(f"✅ Mail verzonden naar {EMAIL_TO}")
+    print(f"Mail verzonden naar {EMAIL_TO}")
 
 
 def main():
@@ -136,10 +146,10 @@ def main():
     new_events = [ev for ev in events if eid(ev) not in seen]
 
     if not new_events:
-        print("Geen nieuwe interessante events gevonden.")
+        print("Geen nieuwe events gevonden.")
         return
 
-    print(f"🎭 Nieuwe interessante events gevonden: {len(new_events)}\n")
+    print(f"Nieuwe events gevonden: {len(new_events)}\n")
 
     lines = [format_event_line(ev) for ev in new_events]
 

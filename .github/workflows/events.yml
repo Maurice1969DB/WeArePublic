@@ -2,8 +2,15 @@ name: Check for Events and Send Email
 
 on:
   schedule:
-    - cron: '0 * * * *'  # ⏰ elke dag, elk uur op :00 UTC
+    - cron: '0 * * * *'  # ⏰ elk uur op :00 UTC
   workflow_dispatch:      # 🔘 handmatig starten mogelijk via GitHub
+
+permissions:
+  contents: write
+
+concurrency:
+  group: events-checker
+  cancel-in-progress: false
 
 jobs:
   check-events:
@@ -11,13 +18,10 @@ jobs:
 
     steps:
       - name: 📥 Repo ophalen
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: 'true'
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
       - name: 🐍 Python installeren
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -32,10 +36,18 @@ jobs:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
-      - name: Commit seen_events.json
-        run:
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git add seen_events.json
-            git commit -m "Update seen events [bot]" || echo "No changes"
-            git push
+      - name: 💾 Commit seen_events.json
+        run: |
+          if [ ! -f seen_events.json ]; then
+            echo "Geen seen_events.json om te committen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add seen_events.json
+          if git diff --cached --quiet; then
+            echo "Geen wijzigingen in seen_events.json."
+            exit 0
+          fi
+          git commit -m "Update seen events [bot]"
+          git push
